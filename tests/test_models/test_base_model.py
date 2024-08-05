@@ -3,9 +3,8 @@
 from datetime import datetime
 import inspect
 import models
-import pycodestyle
+import pep8 as pycodestyle
 import time
-import pytz
 import unittest
 from unittest import mock
 BaseModel = models.base_model.BaseModel
@@ -59,11 +58,6 @@ class TestBaseModelDocs(unittest.TestCase):
 
 class TestBaseModel(unittest.TestCase):
     """Test the BaseModel class"""
-
-    def setUp(self):
-        """Set up timezone-aware datetime"""
-        self.tz = pytz.UTC
-
     def test_instantiation(self):
         """Test that object is correctly created"""
         inst = BaseModel()
@@ -88,14 +82,14 @@ class TestBaseModel(unittest.TestCase):
         """Test that two BaseModel instances have different datetime objects
         and that upon creation have identical updated_at and created_at
         value."""
-        tic = datetime.now(self.tz)
+        tic = datetime.now()
         inst1 = BaseModel()
-        toc = datetime.now(self.tz)
+        toc = datetime.now()
         self.assertTrue(tic <= inst1.created_at <= toc)
-        time.sleep(0.001)
-        tic = datetime.now(self.tz)
+        time.sleep(1e-4)
+        tic = datetime.now()
         inst2 = BaseModel()
-        toc = datetime.now(self.tz)
+        toc = datetime.now()
         self.assertTrue(tic <= inst2.created_at <= toc)
         self.assertEqual(inst1.created_at, inst1.updated_at)
         self.assertEqual(inst2.created_at, inst2.updated_at)
@@ -164,7 +158,3 @@ class TestBaseModel(unittest.TestCase):
         self.assertEqual(old_created_at, new_created_at)
         self.assertTrue(mock_storage.new.called)
         self.assertTrue(mock_storage.save.called)
-
-
-if __name__ == "__main__":
-    unittest.main()
