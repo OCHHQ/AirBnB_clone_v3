@@ -14,8 +14,6 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-import json
-import os
 import pep8
 import unittest
 DBStorage = db_storage.DBStorage
@@ -40,8 +38,7 @@ class TestDBStorageDocs(unittest.TestCase):
     def test_pep8_conformance_test_db_storage(self):
         """Test tests/test_models/test_db_storage.py conforms to PEP8."""
         pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['tests/test_models/test_engine/\
-test_db_storage.py'])
+        result = pep8s.check_files(['tests/test_models/test_db_storage.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
 
@@ -70,9 +67,9 @@ test_db_storage.py'])
 
 @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
 class TestDBStorage(unittest.TestCase):
-    """Test the FileStorage class"""
+    """Test the DBStorage class"""
     def test_all_returns_dict(self):
-        """Test that all returns a dictionaty"""
+        """Test that all returns a dictionary"""
         self.assertIs(type(models.storage.all()), dict)
 
     def test_all_no_class(self):
@@ -82,46 +79,45 @@ class TestDBStorage(unittest.TestCase):
         models.storage.new(new_state)
         models.storage.save()
 
-        session = models.storage._DBStarage__session
+        session = models.storage._DBStorage__session
         all_obj = session.query(State).all()
 
         self.assertTrue(len(all_obj) > 0)
 
     def test_new(self):
-        """test that new adds an object to the database"""
+        """Test that new adds an object to the database"""
         state_data = {"name": "Lagos"}
         new_state = State(**state_data)
         models.storage.new(new_state)
 
-        session = models.storage._DBStarage__session
-        retrieve_state = session.query(State).filter_by(id=new_state).first()
+        session = models.storage._DBStorage__session
+        retrieve_state = session.query(State).filter_by(
+                id=new_state.id).first()
 
         self.assertEqual(retrieve_state.id, new_state.id)
         self.assertEqual(retrieve_state.name, new_state.name)
-        self.assertEqual(retrieve_state)
 
     def test_save(self):
-        """Test that save properly saves objects to file.json"""
-        state_data = {"name": "Casabalanca"}
+        """Test that save properly saves objects to the database"""
+        state_data = {"name": "Casablanca"}
         new_state = State(**state_data)
         models.storage.new(new_state)
         models.storage.save()
 
-        session = models.storage.__format_DBStorage__session
-        retrieve_state = session.query(State).filter_by(id=new_state).first()
+        session = models.storage._DBStorage__session
+        retrieve_state = session.query(State).filter_by(
+                id=new_state.id).first()
 
         self.assertEqual(retrieve_state.id, new_state.id)
         self.assertEqual(retrieve_state.name, new_state.name)
-        self.assertEqual(retrieve_state)
 
     def test_get(self):
-        """test that get returns an object of a given class by id."""
+        """Test that get returns an object of a given class by id."""
         storage = models.storage
         obj = State(name='Michigan')
         obj.save()
         self.assertEqual(obj.id, storage.get(State, obj.id).id)
         self.assertEqual(obj.name, storage.get(State, obj.id).name)
-        self.assertIsNot(obj, storage.get(State, obj.id + 'op'))
         self.assertIsNone(storage.get(State, obj.id + 'op'))
         self.assertIsNone(storage.get(State, 45))
         self.assertIsNone(storage.get(None, obj.id))
@@ -134,7 +130,7 @@ class TestDBStorage(unittest.TestCase):
             storage.get()
 
     def test_count(self):
-        """test that count returns the number of objects of a given class."""
+        """Test that count returns the number of objects of a given class."""
         storage = models.storage
         self.assertIs(type(storage.count()), int)
         self.assertIs(type(storage.count(None)), int)
